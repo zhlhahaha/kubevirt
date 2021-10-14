@@ -62,13 +62,13 @@ func verifyInvalidSetting(field *k8sfield.Path, spec *v1.VirtualMachineInstanceS
 			}
 		}
 	}
-	if &spec.Domain.Devices != nil && spec.Domain.Devices.AutoattachGraphicsDevice != nil && *spec.Domain.Devices.AutoattachGraphicsDevice {
+	/*if &spec.Domain.Devices != nil && spec.Domain.Devices.AutoattachGraphicsDevice != nil && *spec.Domain.Devices.AutoattachGraphicsDevice {
 		return metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueNotSupported,
 			Message: "VGA device is not support by buildin qemu-kvm in virt-launcher image for Arm64, please disable autoattachGraphicsDevice",
 			Field:   field.Child("domain", "device", "autoattachgraphicsdevice").String(),
 		}, false
-	}
+	}*/
 	if spec.Domain.CPU != nil && (&spec.Domain.CPU.Model != nil) && spec.Domain.CPU.Model == "host-model" {
 		return metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueNotSupported,

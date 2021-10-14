@@ -610,7 +610,7 @@ func validateInputDevices(field *k8sfield.Path, spec *v1.VirtualMachineInstanceS
 			})
 		}
 
-		if input.Type != "tablet" {
+		if input.Type != "tablet" && input.Type != "keyboard" && input.Type != "mouse" {
 			causes = append(causes, metav1.StatusCause{
 				Type:    metav1.CauseTypeFieldValueInvalid,
 				Message: "Input device can have only tablet type.",

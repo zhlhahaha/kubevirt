@@ -249,12 +249,12 @@ func checkAndRunVNCViewer(doneChan chan struct{}, viewResChan chan error, port i
 			return
 		}
 	case "linux", "windows":
-		if _, err := exec.LookPath(REMOTE_VIEWER); err == nil {
-			vncBin = REMOTE_VIEWER
-			args = remoteViewerArgs(port)
-		} else if _, err := exec.LookPath(TIGER_VNC); err == nil {
+		if _, err := exec.LookPath(TIGER_VNC); err == nil {
 			vncBin = TIGER_VNC
 			args = tigerVncArgs(port)
+		} else if _, err := exec.LookPath(REMOTE_VIEWER); err == nil {
+			vncBin = REMOTE_VIEWER
+			args = remoteViewerArgs(port)
 		} else {
 			viewResChan <- fmt.Errorf("could not find %s or %s binary in $PATH",
 				REMOTE_VIEWER, TIGER_VNC)

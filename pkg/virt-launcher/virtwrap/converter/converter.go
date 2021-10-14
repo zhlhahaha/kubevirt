@@ -899,7 +899,7 @@ func Convert_v1_Input_To_api_InputDevice(input *v1.Input, inputDevice *api.Input
 		input.Bus = "usb"
 	}
 
-	if input.Type != "tablet" {
+	if input.Type != "tablet" && input.Type != "keyboard" && input.Type != "mouse" {
 		return fmt.Errorf("input contains unsupported type %s", input.Type)
 	}
 
@@ -1698,13 +1698,13 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 
 	if vmi.Spec.Domain.Devices.AutoattachGraphicsDevice == nil || *vmi.Spec.Domain.Devices.AutoattachGraphicsDevice == true {
 		var heads uint = 1
-		var vram uint = 16384
+		//var vram uint = 16384
 		domain.Spec.Devices.Video = []api.Video{
 			{
 				Model: api.VideoModel{
-					Type:  "vga",
+					Type:  "virtio",
 					Heads: &heads,
-					VRam:  &vram,
+					//VRam:  &vram,
 				},
 			},
 		}
