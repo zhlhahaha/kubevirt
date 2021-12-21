@@ -86,3 +86,18 @@ func SkipTestIfNotSEVCapable() {
 	}
 	ginkgo.Skip("no node capable of running SEV workloads detected", 1)
 }
+
+func SkipTestIfNotEnoughSchedulableNode(nodeCount int) {
+	virtClient, err := kubecli.GetKubevirtClient()
+	util.PanicOnError(err)
+	nodes := util.GetAllSchedulableNodes(virtClient)
+	schedulableNodesNum := len(nodes.Items)
+	if schedulableNodesNum < nodeCount {
+		msg := fmt.Sprintf(
+			"no enough Schedulable node: expected %v nodes, but got %v",
+			nodeCount,
+			schedulableNodesNum,
+		)
+		ginkgo.Skip(msg, 1)
+	}
+}

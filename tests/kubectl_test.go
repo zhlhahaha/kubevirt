@@ -6,6 +6,7 @@ import (
 
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
+	"kubevirt.io/kubevirt/tests/framework/checks"
 
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
@@ -19,7 +20,7 @@ import (
 	"kubevirt.io/kubevirt/tests"
 )
 
-var _ = Describe("[sig-compute]oc/kubectl integration", func() {
+var _ = Describe("[sig-compute][arm64]oc/kubectl integration", func() {
 	var (
 		k8sClient, result string
 		err               error
@@ -148,6 +149,8 @@ var _ = Describe("[sig-compute]oc/kubectl integration", func() {
 		var virtClient kubecli.KubevirtClient
 
 		BeforeEach(func() {
+			// Migration needs at least 2 schedulable nodes.
+			checks.SkipTestIfNotEnoughSchedulableNode(2)
 			virtClient, err = kubecli.GetKubevirtClient()
 			Expect(err).ToNot(HaveOccurred())
 		})

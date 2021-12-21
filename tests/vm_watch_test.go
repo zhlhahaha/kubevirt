@@ -16,6 +16,7 @@ import (
 	virtctlvm "kubevirt.io/kubevirt/pkg/virtctl/vm"
 	"kubevirt.io/kubevirt/tests"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
+	"kubevirt.io/kubevirt/tests/framework/checks"
 	"kubevirt.io/kubevirt/tests/util"
 
 	. "github.com/onsi/ginkgo"
@@ -273,20 +274,10 @@ var _ = Describe("[rfe_id:3423][crit:high][arm64][vendor:cnv-qe@redhat.com][leve
 		Expect(vmStatus).To(ConsistOf(vm.Name, MatchRegexp(vmAgeRegex), string(v12.VirtualMachineStatusRunning), MatchRegexp(vmReadyRegex)),
 			"VM should be in the %s status", v12.VirtualMachineStatusRunning)
 
-		// The previous tests would be done, once succeed the following tests would be skipped on the Arm64 cluster
-		// Otherwise, it would show the failures
-		// TODO: remove this once we have more than one node in the Arm64 cluster
-		tests.SkipIfARM64("arm64 cluster only have one node")
+		// Migration needs at least two schedulable node.
+		checks.SkipTestIfNotEnoughSchedulableNode(2)
 
 		By("Migrating the VirtualMachine")
-
-		// Verify we have more than one scheduleable node
-		virtClient, err := kubecli.GetKubevirtClient()
-		Expect(err).ToNot(HaveOccurred())
-
-		nodes := util.GetAllSchedulableNodes(virtClient)
-		Expect(len(nodes.Items)).To(BeNumerically(">=", 2),
-			"Migration requires at least 2 schedulable nodes")
 
 		migrateCommand := tests.NewRepeatableVirtctlCommand(virtctlvm.COMMAND_MIGRATE, "--namespace", vm.Namespace, vm.Name)
 		Expect(migrateCommand()).To(Succeed())

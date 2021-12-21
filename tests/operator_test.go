@@ -71,6 +71,7 @@ import (
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 	"kubevirt.io/kubevirt/tests/flags"
+	"kubevirt.io/kubevirt/tests/framework/checks"
 	"kubevirt.io/kubevirt/tests/libnet"
 )
 
@@ -89,7 +90,7 @@ type vmYamlDefinition struct {
 	vmSnapshots   []vmSnapshotDef
 }
 
-var _ = Describe("[Serial][sig-operator]Operator", func() {
+var _ = Describe("[Serial][sig-operator][arm64]Operator", func() {
 	var originalKv *v1.KubeVirt
 	var originalCDI *cdiv1.CDI
 	var originalOperatorVersion string
@@ -1216,6 +1217,9 @@ spec:
 				}),
 			table.Entry("[test_id:6308] daemonsets",
 				func() {
+					// When only have one node, updating virt-hander would get following error
+					// "Unable to mark node as unschedulable"
+					checks.SkipTestIfNotEnoughSchedulableNode(2)
 					vc, err := virtClient.AppsV1().DaemonSets(originalKv.Namespace).Get(context.Background(), daemonSetName, metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
 
@@ -1781,6 +1785,7 @@ spec:
 
 		// this test ensures that we can deal with image prefixes in case they are not used for tests already
 		It("[test_id:3149]should be able to create kubevirt install with image prefix", func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 
 			if flags.ImagePrefixAlt == "" {
 				Skip("Skip operator imagePrefix test because imagePrefixAlt is not present")
@@ -1847,6 +1852,8 @@ spec:
 		})
 
 		It("[test_id:3150]should be able to update kubevirt install with custom image tag", func() {
+			// TODO: Remove this once qemu-kvm for Arm64 support SATA
+			tests.SkipIfARM64("Currently qemu-kvm for Arm64 does not support SATA, skip this test")
 			if flags.KubeVirtVersionTagAlt == "" {
 				Skip("Skip operator custom image tag test because alt tag is not present")
 			}
@@ -2071,6 +2078,7 @@ spec:
 		Context("[rfe_id:2897][crit:medium][vendor:cnv-qe@redhat.com][level:component]With OpenShift cluster", func() {
 
 			BeforeEach(func() {
+				tests.SkipIfARM64("Currently not works on Arm64")
 				if !tests.IsOpenShift() {
 					Skip("OpenShift operator tests should not be started on k8s")
 				}
@@ -2144,6 +2152,7 @@ spec:
 		})
 
 		It("[test_id:3153]Ensure infra can handle dynamically detecting DataVolume Support", func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 			if !tests.HasDataVolumeCRD() {
 				Skip("Can't test DataVolume support when DataVolume CRD isn't present")
 			}
@@ -2205,6 +2214,7 @@ spec:
 	Context("[rfe_id:2897][crit:medium][vendor:cnv-qe@redhat.com][level:component]With ServiceMonitor Disabled", func() {
 
 		BeforeEach(func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 			if tests.ServiceMonitorEnabled() {
 				Skip("Test applies on when ServiceMonitor is not defined")
 			}
@@ -2229,6 +2239,7 @@ spec:
 	Context("With PrometheusRule Enabled", func() {
 
 		BeforeEach(func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 			if !tests.PrometheusRuleEnabled() {
 				Skip("Test applies on when PrometheusRule is defined")
 			}
@@ -2250,6 +2261,7 @@ spec:
 	Context("With PrometheusRule Disabled", func() {
 
 		BeforeEach(func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 			if tests.PrometheusRuleEnabled() {
 				Skip("Test applies on when PrometheusRule is not defined")
 			}
@@ -2265,6 +2277,7 @@ spec:
 	Context("[rfe_id:2937][crit:medium][vendor:cnv-qe@redhat.com][level:component]With ServiceMonitor Enabled", func() {
 
 		BeforeEach(func() {
+			tests.SkipIfARM64("Currently not works on Arm64")
 			if !tests.ServiceMonitorEnabled() {
 				Skip("Test requires ServiceMonitor to be valid")
 			}
